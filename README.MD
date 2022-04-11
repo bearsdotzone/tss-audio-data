@@ -5,6 +5,8 @@ This README assumes a passing familiarity with the OGG spec.
 
 [Here's this info in action, replacing a Bib Fortuna voice line.](https://youtu.be/uS7JjUNHu5I)
 
+[Look at write.py for a proof of concept program](write.py)
+
 ## FMT Header
 ```c
        00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F  0123456789ABCDEF

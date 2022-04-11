@@ -1,8 +1,7 @@
-# Creates the out file Day Wanna Wanga, embarrasingly manual right now but a good PoC.
+# Transforms the in OGG into an out.AUDIO_DATA. Embarrasingly manual at the moment.
 
-
-f = open("out", "w+b")
-i = open("in", "r+b")
+f = open("out.AUDIO_DATA", "w+b")
+i = open("in.ogg", "r+b")
 
 rateHZ = 32000
 numSamples = 45232
