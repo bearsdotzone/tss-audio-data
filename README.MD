@@ -11,15 +11,10 @@ This README assumes a passing familiarity with the OGG spec.
 0000h: 46 4D 54 20 14 00 00 00 00 00 01 00 00 7D 00 00  FMT .........}.. 
 0010h: B0 B0 00 00 01 20 00 00 78 24 03 00 53 45 45 4B  °°... ..x$..SEEK
 ```
-The predominant header starts `46 4D 54 20 14` or `FMT2014` followed by `00 00 00 00 00 01 00`.
-Of the 130,000 audio data files, 110,000 have this header.
-
-20,000 have `46 4D 54 20 13` and 6 have `46 4D 54 20 10`. In both of these cases, `0A` is 0.
+The predominant header starts `46 4D 54 20 14` or `FMT2014` followed by `00 00 00 00 00 01 00`. Of the 130,000 audio data files, 110,000 have this header. 20,000 have `46 4D 54 20 13` and 6 have `46 4D 54 20 10`. In both of these cases, `0A` is 0.
 
 From `0C`-`0F` is a little endian integer representing the sample rate.
-Of the 130,000 audio data files, 110,000 are 32000hz.
-
-20,000 are 24,000hz, 5,000 are 44,100hz, and 2 are 6,000hz.
+Of the 130,000 audio data files, 110,000 are 32000hz. 20,000 are 24,000hz, 5,000 are 44,100hz, and 2 are 6,000hz.
 
 From `10`-`13` is a little endian integer representing the number of samples.
 
