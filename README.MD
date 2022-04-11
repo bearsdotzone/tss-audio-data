@@ -42,7 +42,7 @@ After 8 empty bytes, which are likely the zeroeth page, we get into the meat of 
 The second integer is a delta between the granule of the earlier page and the current page. While an OGG file stores the granules as a sum, the SEEK header stores the difference.
 
 010 editor is helpful for this until we can get an automated tool up and running.
-[!images/granules.png]
+![010 editor](images/granule.png)
 
 ## DATA Header
 ```c
