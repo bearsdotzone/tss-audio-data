@@ -3,12 +3,11 @@
 import os
 import sys
 from collections import defaultdict
-toRead = ['C:\\Program Files (x86)\\Steam\\steamapps\\common\\LEGO Star Wars - The Skywalker Saga']
+toRead = ['C:\\games\\LEGO Star Wars - The Skywalker Saga']
 fileList = list()
 byteList = dict()
 
-for i in range(32):
-  byteList[hex(i)] = defaultdict(int)
+byteList[0] = defaultdict(int)
 max = 0
 while toRead:
   files = os.scandir(toRead.pop(0))
@@ -18,12 +17,18 @@ while toRead:
     else:
       if "AUDIO_DATA" in f.name:
         fileList.append(f.path)
+counter = 0
 for f in fileList:
   input = open(f, "r+b")
-  data = input.read(32)
-  location = data.find(bytes.fromhex("5345454B"))
-  if location != -1:
+  if not input.readable:
+    input.close()
     continue
+  data = input.read(16)
+  counter+=1
+  # location = data.find(bytes.fromhex("5345454B"))
+  # if location == -1:
+  #   input.close()
+  #   continue
   #   location = data.find(bytes.fromhex("524D53"))
   # if location != -1:
   #   byteList.append(data[:location])
@@ -31,12 +36,16 @@ for f in fileList:
   # if data[24] == 216:
   #   print(f)
 
-  for b in range(8):
-    byteList[hex(b*4)][str(data[b*4:b*4+4])]+=1
+  byteList[0][data[12:]]+=1
+
+  if counter % 10000 == 1:
+    print('*',end="")
+  # print(str(data[32:34]))
   input.close()
-for x in byteList:
+print()
+for k, v in byteList[0].items():
   # if len(byteList[x]) > 1:
-  print(x, byteList[x])
+  print(k.hex(), v)
 
 
 
