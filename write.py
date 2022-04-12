@@ -1,14 +1,18 @@
 # Transforms the in OGG into an out.AUDIO_DATA. Embarrasingly manual at the moment.
 
-f = open("out.AUDIO_DATA", "w+b")
-i = open("in.ogg", "r+b")
+f = open("VO_YODA_DEATH_01.AUDIO_DATA", "w+b")
+i = open("in-yoda.ogg", "r+b")
 
 rateHZ = 32000
-numSamples = 45232
+numSamples = 52355
 numTracks = 1
-numPages = 3
-pages = [0x0000003a, 0x7d4000000d18, 0x337000002dd0]
-inLength = 29672
+
+granules = [0, 11648, 27200, 45632, 52355]
+granuleSum = 0
+pages = [0x3a, 0xE9D, 0x1EF6, 0x2FC1, 0x40B7]
+
+numPages = len(pages)
+inLength = 16622
 
 offset = 0x2B + 8 * numPages + 8 + 1
 
@@ -39,8 +43,10 @@ f.write(bytes.fromhex("00 00 00 00 00 00 00 00"))
 
 # Location of pages, followed by a rolling sum of the granule
 
-for p in pages:
-    f.write(p.to_bytes(8, 'little'))
+for p in range(numPages):
+    f.write(pages[p].to_bytes(4, 'little'))
+    f.write((granules[p] - granuleSum).to_bytes(4, 'little'))
+    granuleSum = granules[p]
 
 
 # data
