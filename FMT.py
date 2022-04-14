@@ -23,8 +23,16 @@ for f in fileList:
   if not input.readable:
     input.close()
     continue
-  data = input.read(16)
+  data = input.read(48)
   counter+=1
+  if counter % 10000 == 1:
+    print('*',end="", flush=True)
+  location = data.find(bytes.fromhex("46525354"))
+  if location == -1:
+    input.close()
+    continue
+  byteList[0][data[10]]+=1
+
   # location = data.find(bytes.fromhex("5345454B"))
   # if location == -1:
   #   input.close()
@@ -36,16 +44,15 @@ for f in fileList:
   # if data[24] == 216:
   #   print(f)
 
-  byteList[0][data[12:]]+=1
+  # byteList[0][data[12:]]+=1
 
-  if counter % 10000 == 1:
-    print('*',end="")
+  
   # print(str(data[32:34]))
   input.close()
 print()
 for k, v in byteList[0].items():
   # if len(byteList[x]) > 1:
-  print(k.hex(), v)
+  print(k, v)
 
 
 
