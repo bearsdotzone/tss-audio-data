@@ -1,5 +1,7 @@
 # OGG-FMT-HEADER
 
+[Releases](/releases)
+
 ## Simple Usage
 
 Download the release package and extract it.
