@@ -2,6 +2,7 @@
 
 import argparse
 import os
+import sys
 
 # Return every location in the input where OggS occurs
 def find_headers(byte_list):
@@ -107,7 +108,17 @@ def main():
         print("Tracks:", tracks_count)
         print("Sample Rate:", rate_count)
 
+    print("{} passes checks".format(args.inputfile))
+
+    
     write_formatted(fn, byte_list, header_list, granule_count, tracks_count, rate_count)
+
+    print("{} written successfully".format(fn))
+
+    print("Press any key to exit")
+    for line in sys.stdin:
+        sys.exit(0)
+    
 
 
 if __name__ == "__main__":

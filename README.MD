@@ -1,15 +1,22 @@
 # tss-audio-data
 Reverse engineering the .AUDIO_DATA files for Lego Star Wars The Skywalker Saga.
 
-## OGG
+## Tools
 
-This README assumes a passing familiarity with the OGG spec.
+[Ogg-FMT-Header](tools/ogg-fmt-header/)
+ - Converts OGG to AUDIO_DATA
 
-[Here's this info in action, replacing a Bib Fortuna voice line.](https://youtu.be/uS7JjUNHu5I)
+## Technical
 
-[Look at write.py for a proof of concept program](write.py)
+### OGG
 
-### FMT Header
+This section assumes a passing familiarity with the OGG spec.
+
+[In game example, replacing a Bib Fortuna voice line](https://youtu.be/uS7JjUNHu5I)
+
+[Implementation example in ogg-fmt-header](tools/ogg-fmt-header/ogg-fmt-header.py)
+
+#### FMT Header
 ```c
        00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F  0123456789ABCDEF
 0000h: 46 4D 54 20 14 00 00 00 00 00 01 00 00 7D 00 00  FMT .........}.. 
@@ -26,7 +33,7 @@ From `10`-`13` is a little endian integer representing the number of samples.
 
 `18`-`1B` is currently unknown. Across the files there are ten different formats, `78 24 03 00` is overwhelmingly the most common.
 
-### SEEK Header
+#### SEEK Header
 ```c
        00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F  0123456789ABCDEF
 0010h: B0 B0 00 00 01 20 00 00 78 24 03 00 53 45 45 4B  °°... ..x$..SEEK 
@@ -43,7 +50,7 @@ The second integer is a delta between the granule of the earlier page and the cu
 010 editor is helpful for this until we can get an automated tool up and running.
 ![010 editor](images/granule.png)
 
-### DATA Header
+#### DATA Header
 ```c
        00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F  0123456789ABCDEF
 0040h: 70 33 00 00 44 41 54 41 E8 73 00 00 4F 67 67 53  p3..DATAès..OggS
@@ -52,7 +59,7 @@ This one's real simple and comes right after the end of SEEK. Simply put `DATA` 
 
 Immediately after this the OGG file begins in earnest with its header info.
 
-## FRST
+### FRST
 Theses files tend to be shorter, death sound effects and such. But not the sound effects in the SOUNDFX folder, those are just WAVs. This format is not fully understood yet.
 ```c
        00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F  0123456789ABCDEF
