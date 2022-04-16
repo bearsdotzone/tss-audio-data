@@ -1,6 +1,6 @@
 # OGG-FMT-HEADER
 
-[Releases](/releases)
+[Releases](https://github.com/bearsdotzone/tss-audio-data/releases/latest)
 
 ## Simple Usage
 
