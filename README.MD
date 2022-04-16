@@ -72,18 +72,12 @@ Theses files tend to be shorter, death sound effects and such. But not the sound
 0x0C - 0x0F is the sample rate.
 0x10 - 0x13 is the number of samples.
 
-0x14 as a short is in some way meaningful. It is 4097 across all the files, I believe this points to a memory address 4097 bytes before the end of the file. I assume that address has something to do with samples remaining.
+0x14 is the number of tracks
 
-0x18 as a short is also meaningful. It is 1028 which when we go back 1028 from the end of the file we see the message LAST and then four bytes which I think also represents samples remaining.
+0x18 - 0x19 is the distance from the end of the file where you shall expected to find a LAST block. This value is later multiplied by the number of tracks.
 
 0x1B says DATA then 0x1F is an int representing the remaining file size.
 
-Then at 0x23 we get the FRST header. After that I don't know. It appears to be some sort of wav, consistent with the SOUNDFX files.
+At 0x14 * (0x18 thru 0x19) from the end of the file we get LAST followed by an int.
 
-VO_YODA_DEATH_01 kinda works? I exported from audacity as microsoft acpdm because that's what the other WAVs appear to be but it doesn't *look* like the original so it's probably wrong in some way. But then again the SOUNDFX files don't look like the FRST files either? Would they use two different types of WAV encoding for two types of sounds?
-
-TT also may have measured 4097 from the front and 1028 from the back which seems psychopathic. It seems important that these numbers are real close to powers of 2 but I don't know how. I wonder then if that is affected by the 35 offset. Yui suggested that some of the files are IMA ADPCM so I'll mess around with that.
-
-Even very large FRST files only point to 1028 and 4097.
-
-Rather than samples remaining it could be a summation thing. The tricky thing is measuring 4097, 1028 seems pretty clear. In the game files it's a little unclear if it *is* samples remaining because the numbers don't line up great for that. A WAV should theoretically be two samples per byte and they can average out to that but I don't understand how the values are decided in the real files.
+We do not know yet what this int represents
