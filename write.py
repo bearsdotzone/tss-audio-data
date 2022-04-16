@@ -1,61 +1,121 @@
 # Transforms the in OGG into an out.AUDIO_DATA. Embarrasingly manual at the moment.
 
-f = open("VO_YODA_DEATH_01.AUDIO_DATA", "w+b")
-i = open("in-yoda.ogg", "r+b")
+import argparse
+import os
 
-rateHZ = 32000
-numSamples = 52355
-numTracks = 1
+# Return every location in the input where OggS occurs
+def find_headers(byte_list):
+    to_return = []
+    for i in range(len(byte_list)-3):
+        if (byte_list[i:i+4] == b'OggS'):
+            to_return += [i]
+    return to_return
 
-granules = [0, 11648, 27200, 45632, 52355]
-granuleSum = 0
-pages = [0x3a, 0xE9D, 0x1EF6, 0x2FC1, 0x40B7]
+def get_granule(byte_list, pos):
+    granule = byte_list[pos+6:pos+14]
+    granule_val = int.from_bytes(granule, "little")
+    assert(granule_val > -1)
+    # The largest audio file in the game is just short of 18 million samples
+    return granule_val
 
-numPages = len(pages)
-inLength = 16622
+def get_tracks(byte_list):
+    tracks_val = byte_list[0x27]
+    assert(tracks_val > 0 and tracks_val < 16)
+    return tracks_val
 
-offset = 0x2B + 8 * numPages + 8 + 1
+def get_sample_rate(byte_list):
+    sample_val = int.from_bytes(byte_list[0x28:0x2B], "little")
+    assert(sample_val > 0 and sample_val < 50000)
+    return sample_val
+
+def write_formatted(out_file, byte_list, header_list, granule_count, tracks_count, rate_count):
+    f = open(out_file, "w+b")
+    # FMT2014
+    f.write(bytes.fromhex("46 4D 54 20 14 00 00 00 00 00 01 00"))
+    # HZ
+    f.write(rate_count.to_bytes(4, 'little'))
+
+    # SAMPLES
+    f.write(granule_count.to_bytes(4, 'little'))
+
+    # TRACKS
+    f.write(tracks_count.to_bytes(1, 'little'))
+
+    # IDK
+    f.write(bytes.fromhex("20 00 00"))
+
+    # One of ten values, nearly always the following
+    f.write(bytes.fromhex("78 24 03 00"))
+
+    # SEEK
+    f.write(bytes.fromhex("53 45 45 4B"))
+
+    # The length of the seek section as determined by number of pages
+    f.write(((len(header_list))*8).to_bytes(4, 'little'))
+
+    # The memory location of the pages, followed by a rolling sum of the granule
+    granuleSum = 0
+
+    for memory_location in header_list:
+        granule = get_granule(byte_list, memory_location)
+        f.write(memory_location.to_bytes(4, 'little'))
+        f.write((granule - granuleSum).to_bytes(4, 'little'))
+        granuleSum = granule
 
 
-# FMT2014
-f.write(bytes.fromhex("46 4D 54 20 14 00 00 00 00 00 01 00"))
-# HZ
-f.write(rateHZ.to_bytes(4, 'little'))
+    # data
+    f.write(bytes.fromhex("44 41 54 41"))
 
-# SAMPLES
-f.write(numSamples.to_bytes(4, 'little'))
+    # The length of the ogg file to be added
+    f.write(len(byte_list).to_bytes(4, 'little'))
 
-# TRACKS
-f.write(numTracks.to_bytes(1, 'little'))
+    # The supplied ogg file
+    f.write(byte_list)
 
-# IDK
-f.write(bytes.fromhex("20 00 00"))
-
-# One of ten values, nearly always the following
-f.write(bytes.fromhex("78 24 03 00"))
-
-# SEEK
-f.write(bytes.fromhex("53 45 45 4B"))
-
-# Length of seek
-f.write(((numPages+1)*8).to_bytes(4, 'little'))
-f.write(bytes.fromhex("00 00 00 00 00 00 00 00"))
-
-# Location of pages, followed by a rolling sum of the granule
-
-for p in range(numPages):
-    f.write(pages[p].to_bytes(4, 'little'))
-    f.write((granules[p] - granuleSum).to_bytes(4, 'little'))
-    granuleSum = granules[p]
+    f.close()
 
 
-# data
-f.write(bytes.fromhex("44 41 54 41"))
 
-# length of ogg file
-f.write(inLength.to_bytes(4, 'little'))
+def main():
 
-f.write(i.read())
+    parser = argparse.ArgumentParser()
+    parser.add_argument('inputfile')
+    parser.add_argument('-o', '--outputfile')
+    parser.add_argument('-d', '--debug', action='store_true', default=False)
+    args = parser.parse_args()
 
-f.close()
-i.close()
+    if not os.path.exists(args.inputfile):
+        raise FileNotFoundError(args.inputfile)
+
+    i = open(args.inputfile, "r+b")
+
+    byte_list = i.read()
+
+    assert(byte_list[0:4] == b'OggS')
+
+    i.close()
+    
+    fn = args.inputfile + ".AUDIO_DATA"
+
+    if args.outputfile is not None:
+        if os.path.exists(args.inputfile):
+            fn = args.outputfile
+        else:
+            raise FileNotFoundError(args.inputfile)
+
+    header_list=find_headers(byte_list)
+    granule_count=get_granule(byte_list,header_list[-1])
+    tracks_count=get_tracks(byte_list)
+    rate_count=get_sample_rate(byte_list)
+    if args.debug:
+        for x in header_list:
+            print("granule {} memory {}".format(get_granule(byte_list, x), x))
+        print("Num Samples / Maximum Granule:", granule_count)
+        print("Tracks:", tracks_count)
+        print("Sample Rate:", rate_count)
+
+    write_formatted(fn, byte_list, header_list, granule_count, tracks_count, rate_count)
+
+
+if __name__ == "__main__":
+    main()

@@ -27,11 +27,13 @@ for f in fileList:
   counter+=1
   if counter % 10000 == 1:
     print('*',end="", flush=True)
-  location = data.find(bytes.fromhex("46525354"))
-  if location == -1:
-    input.close()
-    continue
-  byteList[0][data[10]]+=1
+
+  
+  # location = data.find(bytes.fromhex("46525354"))
+  # if location == -1:
+  #   input.close()
+  #   continue
+  byteList[0][data[14]]+=1
 
   # location = data.find(bytes.fromhex("5345454B"))
   # if location == -1:
