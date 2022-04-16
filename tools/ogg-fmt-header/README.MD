@@ -4,7 +4,7 @@
 
 Demonstration
 
-![Demonstration](assets/demonstration.mp4)
+![Demonstration](assets/demonstration.gif)
 
 ## Simple Usage
 
