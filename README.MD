@@ -3,7 +3,7 @@ Reverse engineering the .AUDIO_DATA files for Lego Star Wars The Skywalker Saga.
 
 ## Tools
 
-[Ogg-FMT-Header](tools/ogg-fmt-header/)
+[Ogg-FMT-Header Instructions](tools/ogg-fmt-header/)
  - Converts OGG to AUDIO_DATA
 
 ## Technical
