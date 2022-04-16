@@ -20,39 +20,34 @@ def get_granule(byte_list, pos):
 
 def get_tracks(byte_list):
     tracks_val = byte_list[0x27]
-    assert(tracks_val > 0 and tracks_val < 16)
+    assert(tracks_val > 0)
+    # I'm not confident what the max amount of tracks would be
     return tracks_val
 
 def get_sample_rate(byte_list):
     sample_val = int.from_bytes(byte_list[0x28:0x2B], "little")
-    assert(sample_val > 0 and sample_val < 50000)
+    assert(sample_val > 0)
+    # I don't know the limits of what sample rates the engine supports
     return sample_val
 
 def write_formatted(out_file, byte_list, header_list, granule_count, tracks_count, rate_count):
     f = open(out_file, "w+b")
     # FMT2014
     f.write(bytes.fromhex("46 4D 54 20 14 00 00 00 00 00 01 00"))
-    # HZ
+    # Write the sample rate
     f.write(rate_count.to_bytes(4, 'little'))
-
-    # SAMPLES
+    # Write the number of samples
     f.write(granule_count.to_bytes(4, 'little'))
-
-    # TRACKS
+    # Write the number of tracks
     f.write(tracks_count.to_bytes(1, 'little'))
-
-    # IDK
+    # UNKNOWN
     f.write(bytes.fromhex("20 00 00"))
-
-    # One of ten values, nearly always the following
+    # UNKNOWN - One of ten values, nearly always the following
     f.write(bytes.fromhex("78 24 03 00"))
-
     # SEEK
     f.write(bytes.fromhex("53 45 45 4B"))
-
     # The length of the seek section as determined by number of pages
     f.write(((len(header_list))*8).to_bytes(4, 'little'))
-
     # The memory location of the pages, followed by a rolling sum of the granule
     granuleSum = 0
 
@@ -62,13 +57,10 @@ def write_formatted(out_file, byte_list, header_list, granule_count, tracks_coun
         f.write((granule - granuleSum).to_bytes(4, 'little'))
         granuleSum = granule
 
-
     # data
     f.write(bytes.fromhex("44 41 54 41"))
-
     # The length of the ogg file to be added
     f.write(len(byte_list).to_bytes(4, 'little'))
-
     # The supplied ogg file
     f.write(byte_list)
 
@@ -91,7 +83,8 @@ def main():
 
     byte_list = i.read()
 
-    assert(byte_list[0:4] == b'OggS')
+    assert(byte_list[0x0:0x4] == b'OggS')
+    assert(byte_list[0x1D:0x23] == b'vorbis')
 
     i.close()
     
