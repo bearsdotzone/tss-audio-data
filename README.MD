@@ -31,7 +31,7 @@ From `10`-`13` is a little endian integer representing the number of samples.
 
 `14` is the number of tracks. `15`-`17` appear to be packing against the track value.
 
-`18`-`1B` is currently unknown. Across the files there are ten different formats, `78 24 03 00` is overwhelmingly the most common.
+`18`-`1B` is not fully understood. There are eleven different values for it across all of the game files. It appears as though a larger value is used in accordance with a larger file. A too big or arbitrary value does not seem to cause issues, a too small value will render the audio unplayable.
 
 #### SEEK Header
 ```c
