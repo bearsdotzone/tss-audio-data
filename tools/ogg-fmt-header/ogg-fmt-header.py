@@ -41,10 +41,19 @@ def write_formatted(out_file, byte_list, header_list, granule_count, tracks_coun
     f.write(granule_count.to_bytes(4, 'little'))
     # Write the number of tracks
     f.write(tracks_count.to_bytes(1, 'little'))
-    # UNKNOWN
+    # UNKNOWN - Likely packing
     f.write(bytes.fromhex("20 00 00"))
-    # UNKNOWN - One of ten values, nearly always the following
-    f.write(bytes.fromhex("78 24 03 00"))
+
+    # UNKNOWN - I don't know what these values represent but these are the only
+    # ones that exist in all the files. It seems like it may have something to
+    # do with size, going to a higher value doesn't appear to break things, but
+    # going to a lower value can. I'm interpreting the breakpoints here as
+    # roughly a megabyte. 🤷‍♀️ The game seems to support arbitrary values too so
+    # it's unclear why there exist only these 11.
+    magic_list = [205944,207112,218300,219464,230656,231832,232608,243004,244184,267716,268904]
+    bytes_to_write = magic_list[min(len(byte_list) // 1000000, 10)]
+    f.write(bytes_to_write.to_bytes(4, 'little'))
+    
     # SEEK
     f.write(bytes.fromhex("53 45 45 4B"))
     # The length of the seek section as determined by number of pages
